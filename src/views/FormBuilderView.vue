@@ -19,7 +19,7 @@
             </select>
             </div>   
     <div class="col-auto" id="etiqueta-group"><!--Grupo etiqueta-->
-    <label for="field-label" style="margin-right: 10px;">Etiqueta del Campo:</label>
+    <label for="field-label" style="margin-right: 10px;" id="etiqueta-group-label">Etiqueta del Campo:</label>
     <input type="text" id="field-label" v-model="label">
     </div>
     <div class="col-auto" id="requerido-group"><!-- Grupo requerido -->
@@ -74,13 +74,31 @@ mounted(){
   });*/
 },
 methods:{
-
-    
+    //Actualizar form builder segun el tipo de campo seleccionado
+miSelect:addEventListener('change', function() {
+  const miSelect = document.getElementById('field-type');
+  const $grupoPlaceholder = document.getElementById('placeholder-group');
+  const $grupoEtiqueta = document.getElementById('etiqueta-group');
+  const $grupoRequerido = document.getElementById('requerido-group');
+  let opcionSeleccionada = miSelect.value;
+  if (opcionSeleccionada === 'select' || opcionSeleccionada === 'checkbox' 
+  || opcionSeleccionada === 'submit' || opcionSeleccionada === 'reset' ) {
+    $grupoPlaceholder.style.display = "none";
+    if (opcionSeleccionada === 'submit' || opcionSeleccionada === 'reset' ) {
+      $grupoEtiqueta.style.display = "none";
+      $grupoRequerido.style.display = "none";
+    }   
+  }else{
+    $grupoPlaceholder.style.display = "block";
+    $grupoEtiqueta.style.display = "block";
+    $grupoRequerido.style.display = "block";}
+}),
+    //Agregar campos
     addField(){   
-    const label = document.getElementById('field-label').value;
-    const type = document.getElementById('field-type').value;
-    const required = document.getElementById('field-required').checked;
-    const placeholder = document.getElementById('field-placeholder').value;
+    let label = document.getElementById('field-label').value;
+    let type = document.getElementById('field-type').value;
+    let required = document.getElementById('field-required').checked;
+    let placeholder = document.getElementById('field-placeholder').value;
       
     let options; // Declaramos la variable aquí
 
@@ -91,10 +109,16 @@ methods:{
       if (!selectOptions) return; // Si no hay opciones, no agregar el campo
       options = selectOptions.split(','); // Asignamos el valor a la variable
       this.formFields.push({ label, type, required, placeholder, options });
-    } else {
+      placeholder='';
+    } else{
       this.formFields.push({ label, type, required, placeholder });
-
+    
     }
+       //resetear formulario de crear campos
+      this.label = '';
+      this.type = 'text';
+      this.required = false;
+      this.placeholder = '';
     },
     updateFormFieldsOrder(){
       const updatedFields = [];
@@ -117,6 +141,7 @@ methods:{
 
     this.formFields.length = 0;
     this.formFields.push(...updatedFields);
+
   },
   showFormData(){
     console.log('Campos del Formulario:');
