@@ -4,7 +4,7 @@
     <div class="navbar-brand">
       <i class="bi bi-person rounded-pill" style="color: antiquewhite;"></i><!--ajustar icono user-->
       Usuario</div>
-    <button v-on:click = "fetch" class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
       <!-- boton activador !!-->
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -31,12 +31,14 @@ import axios from "axios";
 export default{
   name: "App",
   data: function(){ return { formularios:[] } },
+  created(){
+    this.fetch();
+  },
   methods:{
     fetch (){
       let result = axios.get("http://localhost:5045/api/ConfigForm/ListaFormulariosMenu")
       .then((respuesta) => {
         this.formularios = respuesta.data.lista
-        console.log(respuesta.data.lista);
       })
       .catch(err => {
       console.log(err);

@@ -7,4 +7,6 @@ import '@/assets/bootstrap.bundle.min.js'
 import axios from "axios";
 import VueAxios from "vue-axios";
 
-createApp(App).use(VueAxios, axios).use(store).use(router).mount('#app')
+import BootstrapVue from 'bootstrap-vue'
+createApp(App).use(VueAxios, axios).use(store).use(router).mount('#app');
+//Vue.use(BToast);
