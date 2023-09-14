@@ -65,7 +65,7 @@
             <br>
             <div>
               <!-- boton de eliminar -->
-              <span @click="EliminarCampoVistaPrevia"> <!-- funcion de eliminar -->
+              <span @click="deleteFields(index)"> <!-- funcion de eliminar -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
                   class="bi bi-x-square-fill" viewBox="0 0 16 16">
                   <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 
@@ -140,7 +140,7 @@ export default {
         $grupoRequerido.style.display = "block";
       }
     }),
-    //Agregar campos
+    //    ARREGLO QUE GUARDA LOS ELEMENTOS
     addField() {
       let label = document.getElementById('field-label').value;
       let type = document.getElementById('field-type').value;
@@ -201,6 +201,11 @@ export default {
       console.log(this.formFields);
     },
 
+    // Función que elimina los campos del lienzo
+
+    deleteFields(index){
+      this.formFields.splice(index,1);
+    },
 
     //Funcion que envia los datos a la consola
     showFormData() {
@@ -219,6 +224,8 @@ export default {
     },
   },
 };
+
+
 </script>
 <style scoped>
 #form-builder {
