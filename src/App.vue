@@ -1,14 +1,11 @@
 <template>
- <!-- <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/gestionModulos">Gestion de modulos</router-link>|
-  </nav>-->
   <nav class="navbar bg-dark navbar-dark">
   <div class="container-fluid">
     <div class="navbar-brand">
       <i class="bi bi-person rounded-pill" style="color: antiquewhite;"></i><!--ajustar icono user-->
       Usuario</div>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+      <!-- boton activador !!-->
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="collapsibleNavbar">
@@ -17,10 +14,10 @@
           <router-link to="/" class="nav-link">Inicio</router-link>
         </li>
         <li class="nav-item">
-          <router-link to="/gestionModulos" class="nav-link">Gestion de modulos</router-link>
+          <router-link to="/formularios" class="nav-link">Gestion de modulos</router-link>
         </li>
-        <li>
-          <p class="nav-link">Modulos creados</p><!--configurar-->
+        <li v-for="formulario of formularios" :key="formulario.idConfigForm">
+  <router-link :to="`/modules/${formulario.idConfigForm}`" class="nav-link">{{ formulario.titulo }}</router-link>
         </li>
       </ul>
     </div>
@@ -28,7 +25,28 @@
 </nav>  
   <router-view/>
 </template>
+<script>
+import axios from "axios"; 
 
+export default{
+  name: "App",
+  data: function(){ return { formularios:[] } },
+  created(){
+    this.fetch();
+  },
+  methods:{
+    fetch (){
+      let result = axios.get("http://localhost:5045/api/ConfigForm/ListaFormulariosMenu")
+      .then((respuesta) => {
+        this.formularios = respuesta.data.lista
+      })
+      .catch(err => {
+      console.log(err);
+      });
+    }
+  }
+};
+</script>
 <style>
 /*#app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
