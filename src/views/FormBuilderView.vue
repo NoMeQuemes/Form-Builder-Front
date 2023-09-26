@@ -41,11 +41,11 @@
     </div>
     <br>
     <!-- Los campos se agregarán aquí -->
-    <div id="form-builder">
+    <div id="form-builder" class="mx-auto">
       <div v-for="(field, index) in formFields" :key="index">
-        <div class="row" align-items-center>
+        <div class="row" align-items-center :id="field.id">
           <div class="col">
-            <field-component :field="field" />
+            <field-component :field="field"/>
           </div>
           <div class="col-3 col-md-1" style="margin: 0 auto; padding: 0;">
             <div>
@@ -66,7 +66,7 @@
             <div>
               <!-- boton de eliminar -->
               <span @click="deleteFields(index)"> <!-- funcion de eliminar -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="red"
                   class="bi bi-x-square-fill" viewBox="0 0 16 16">
                   <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 
   2-2V2a2 2 0 0 0-2-2H2zm3.354 4.646L8 7.293l2.646-2.647a.5.5 0 
@@ -83,9 +83,13 @@
     </div>
 
     <br>
-    <button @click="showFormData">Enviar a consola</button><!--Envia las propiedades de los campos a la consola-->
+    <div class="d-grid justify-content-end">
+      <button class="btn btn-primary" @click="showFormData">Enviar a consola</button><!--Envia las propiedades de los campos a la consola-->
+    </div>
   </div>
 </template>
+
+
 <script>
 import Sortable from 'sortablejs'//corregir
 import { ref } from 'vue';
@@ -102,21 +106,31 @@ export default {
       type: 'text',
       required: false,
       placeholder: '',
+      fieldCounter : 1,
     };
   },
   mounted() {
-    this.formBuilder = document.getElementById('form-builder'); // Asigna el elemento a formBuilder
+    this.formBuilder = document.getElementById('form-builder');
     new Sortable(this.formBuilder, {
       animation: 150,
       handle: '.draggable-handle',
-      onEnd: this.probar,
+      onEnd: () => {
+        console.log("Se insertó un elemento")
+      },
+      group: "fieldsList",
+      store: {
+        set: (sortable) => {
+          const order = sortable.toArray();
+          console.log(order)
+        }
+      }
     });
   },
   methods: {
-    probar() {
-      console.log("prueba1");
-      //funcion que reordene los campos
-    },
+    // probar() {
+    //   console.log("prueba1");
+    //   //funcion que reordene los campos
+    // },
 
     EliminarCampoVistaPrevia() { console.log("eliminar") },
 
@@ -148,63 +162,63 @@ export default {
       let placeholder = document.getElementById('field-placeholder').value;
       let options; // Declaramos la variable aquí
 
-
-
+      const fieldId = this.fieldCounter;
+      this.fieldCounter++; // Incrementar el contador de campos
 
       if (type === 'select') {
         const selectOptions = prompt('Ingrese opciones del select (separadas por coma)');
         if (!selectOptions) return; // Si no hay opciones, no agregar el campo
         options = selectOptions.split(','); // Asignamos el valor a la variable
-        this.formFields.push({ label, type, required, placeholder, options });
+        this.formFields.push({ id: fieldId, label, type, required, placeholder, options });
         placeholder = '';
       } else {
-        this.formFields.push({ label, type, required, placeholder });
-
+        this.formFields.push({ id: fieldId, label, type, required, placeholder });
       }
-      //resetear formulario de crear campos
+
+      // Resetear formulario de crear campos
       this.label = '';
       this.type = 'text';
       this.required = false;
       this.placeholder = '';
     },
 
+    // Función que reordena los campos luego al final del sortable (primera función)
+    // updateFormFieldsOrder() {
+    //   if (!this.formBuilder) {
+    //     console.error('formBuilder is not defined'); // Manejo de errores si formBuilder no está definido
+    //     return;
+    //   }
+    //   const updatedFields = [];
+    //   const fieldElements = this.formBuilder.querySelectorAll('div');
+    //   fieldElements.forEach(element => {
+    //     const label = element.querySelector('label').textContent;
+    //     const type = element.querySelector('input, select').tagName.toLowerCase();
+    //     const required = element.querySelector('input, select').hasAttribute('required');
+    //     const placeholder = element.querySelector('input, select').getAttribute('placeholder');
+    //     const options = [];
+    //     if (type === 'select') {
+    //       const selectElement = element.querySelector('select');
+    //       const optionElements = selectElement.querySelectorAll('option');
+    //       optionElements.forEach(option => {
+    //         options.push(option.textContent);
+    //       });
+    //     }
+    //     updatedFields.push({ label, type, required, placeholder, options });
+    //   });
 
+    //   this.formFields.length = 0;
+    //   this.formFields.push(...updatedFields);
 
-    //FUncion que reordena los campos luego al final del sortable
-    updateFormFieldsOrder() {
-      if (!this.formBuilder) {
-        console.error('formBuilder is not defined'); // Manejo de errores si formBuilder no está definido
-        return;
-      }
-      const updatedFields = [];
-      const fieldElements = this.formBuilder.querySelectorAll('div');
-      fieldElements.forEach(element => {
-        const label = element.querySelector('label').textContent;
-        const type = element.querySelector('input, select').tagName.toLowerCase();
-        const required = element.querySelector('input, select').hasAttribute('required');
-        const placeholder = element.querySelector('input, select').getAttribute('placeholder');
-        const options = [];
-        if (type === 'select') {
-          const selectElement = element.querySelector('select');
-          const optionElements = selectElement.querySelectorAll('option');
-          optionElements.forEach(option => {
-            options.push(option.textContent);
-          });
-        }
-        updatedFields.push({ label, type, required, placeholder, options });
-      });
+    // // Muestra el estado final de formFields después de actualizar
+    //   console.log(this.formFields);
+    // },
 
-      this.formFields.length = 0;
-      this.formFields.push(...updatedFields);
-
-      // Muestra el estado final de formFields después de actualizar
-      console.log(this.formFields);
-    },
+    
 
     // Función que elimina los campos del lienzo
 
-    deleteFields(index){
-      this.formFields.splice(index,1);
+    deleteFields(index) {
+      this.formFields.splice(index, 1);
     },
 
     //Funcion que envia los datos a la consola
@@ -227,14 +241,26 @@ export default {
 
 
 </script>
+
+
 <style scoped>
+
+
 #form-builder {
-  min-height: 280px;
-  border: 2px dashed #ccc;
+  width: 1000px;
+  height: 480px;
+  border: 3px solid #2d579a;
   padding: 40px;
+  background-color: #e6e6e6;
+  border-radius: 7px;
+  overflow: auto;
 }
 
 #contenedor-padre {
   margin: 20px;
+}
+
+.draggable-handle{
+  cursor: move;
 }
 </style>
