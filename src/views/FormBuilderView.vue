@@ -42,8 +42,8 @@
     <br>
     <!-- Los campos se agregarán aquí -->
     <div id="form-builder" class="mx-auto">
-      <div v-for="(field, index) in formFields" :key="index">
-        <div class="row" align-items-center :id="field.id">
+      <div v-for="(field, index) in formFields" :key="index" :data-id="field.id">
+        <div class="row" align-items-center>
           <div class="col">
             <field-component :field="field"/>
           </div>
@@ -83,10 +83,12 @@
     </div>
 
     <br>
-    <div class="d-grid justify-content-end">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
       <button class="btn btn-primary" @click="showFormData">Enviar a consola</button><!--Envia las propiedades de los campos a la consola-->
+      <button class="btn btn-success" @click="createForm">Crear Formulario</button>
     </div>
   </div>
+
 </template>
 
 
@@ -107,6 +109,7 @@ export default {
       required: false,
       placeholder: '',
       fieldCounter : 1,
+      order: [],
     };
   },
   mounted() {
@@ -114,23 +117,20 @@ export default {
     new Sortable(this.formBuilder, {
       animation: 150,
       handle: '.draggable-handle',
+      dataIdAttr: "data-id",
       onEnd: () => {
-        console.log("Se insertó un elemento")
+        console.log("Se insertó un elemento");
       },
       group: "fieldsList",
       store: {
         set: (sortable) => {
-          const order = sortable.toArray();
-          console.log(order)
+          this.order = sortable.toArray();
+          console.log(this.order)
         }
       }
     });
   },
   methods: {
-    // probar() {
-    //   console.log("prueba1");
-    //   //funcion que reordene los campos
-    // },
 
     EliminarCampoVistaPrevia() { console.log("eliminar") },
 
@@ -163,7 +163,8 @@ export default {
       let options; // Declaramos la variable aquí
 
       const fieldId = this.fieldCounter;
-      this.fieldCounter++; // Incrementar el contador de campos
+
+      this.fieldCounter++;
 
       if (type === 'select') {
         const selectOptions = prompt('Ingrese opciones del select (separadas por coma)');
@@ -182,39 +183,6 @@ export default {
       this.placeholder = '';
     },
 
-    // Función que reordena los campos luego al final del sortable (primera función)
-    // updateFormFieldsOrder() {
-    //   if (!this.formBuilder) {
-    //     console.error('formBuilder is not defined'); // Manejo de errores si formBuilder no está definido
-    //     return;
-    //   }
-    //   const updatedFields = [];
-    //   const fieldElements = this.formBuilder.querySelectorAll('div');
-    //   fieldElements.forEach(element => {
-    //     const label = element.querySelector('label').textContent;
-    //     const type = element.querySelector('input, select').tagName.toLowerCase();
-    //     const required = element.querySelector('input, select').hasAttribute('required');
-    //     const placeholder = element.querySelector('input, select').getAttribute('placeholder');
-    //     const options = [];
-    //     if (type === 'select') {
-    //       const selectElement = element.querySelector('select');
-    //       const optionElements = selectElement.querySelectorAll('option');
-    //       optionElements.forEach(option => {
-    //         options.push(option.textContent);
-    //       });
-    //     }
-    //     updatedFields.push({ label, type, required, placeholder, options });
-    //   });
-
-    //   this.formFields.length = 0;
-    //   this.formFields.push(...updatedFields);
-
-    // // Muestra el estado final de formFields después de actualizar
-    //   console.log(this.formFields);
-    // },
-
-    
-
     // Función que elimina los campos del lienzo
 
     deleteFields(index) {
@@ -226,6 +194,9 @@ export default {
       console.log('Campos del Formulario:');
       this.formFields.forEach((field, index) => {
         console.log(`Campo ${index + 1}`);
+        if(this.order[index]){
+          console.log('N° de orden: ', this.order[index]);
+        }
         console.log('  Etiqueta:', field.label);
         console.log('  Tipo:', field.type);
         console.log('  Requerido:', field.required);
@@ -235,6 +206,34 @@ export default {
         }
       });
 
+    },
+
+    // FUNCIÓN PARA CREAR FORMULARIO FINAL
+    createForm() {
+      const currentOrder = this.order;
+      const reorderedFields = [];
+
+      currentOrder.forEach((fieldId, index) => {
+        const field = this.formFields.find((f) => f.id === parseInt(fieldId, 10));
+        if (field) {
+          field.id = index + 1;
+          reorderedFields.push(field);
+        }
+      });
+
+      this.formFields = reorderedFields;
+
+      console.log('FORMULARIO CREADO:');
+      this.formFields.forEach((field, index) => {
+        console.log(`Campo ${field.id}:`);
+        console.log('  Etiqueta:', field.label);
+        console.log('  Tipo:', field.type);
+        console.log('  Requerido:', field.required);
+        console.log('  Marcador de posición:', field.placeholder);
+        if (field.type === 'select') {
+          console.log('  Opciones:', field.options.join(', '));
+        }
+      });
     },
   },
 };
